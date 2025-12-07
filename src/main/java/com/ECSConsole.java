@@ -31,7 +31,7 @@ public class ECSConsole {
     // Version number, used to determine if the menu should be run or not
     private static final double version = 0.1;
     // Used to test the GUI will later be changed to a CLI mode to allow for simpler CLI implementations
-    private static final boolean guiMode = false;
+    private static final boolean guiMode = true;
 
 
     public static void main(String[] args) {
@@ -223,16 +223,12 @@ public class ECSConsole {
 
 // This is the GUI, eventually this will become the meat of the main class, this will query a class that exist for the
 // purpose of interacting with the databases and updating information. The main class will then no longer directly
-// manipulate the main class.
+// manipulate the Database.
 class Interface {
     //create the variables corresponding to the pieces that will make up the primary GUI window
     private JFrame window;
     private JTextField eqSearchTextField;
-    private JPanel menuPanel;
-    private JPanel cardPanel;
-    private JPanel searchPanel;
-    private JPanel reportPanel;
-    private JPanel checkoutPanel;
+    private JPanel menuPanel,cardPanel,searchPanel,reportPanel,checkoutPanel;
     private JTextPane searchTextArea;
     private JScrollPane searchScroll;
 
@@ -260,30 +256,10 @@ class Interface {
 
         window.add(cardPanel, BorderLayout.CENTER); // Adds to the center panel in the
 
-        //------------------- Start of Menu Panel -------------------//
-        // This panel will contain a series of buttons that will change the content to the card panel.
-        menuPanel = new JPanel();
-        menuPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 5));
-
+        menuPanel = MenuPanel.initMenuPanel();
         window.add(menuPanel, BorderLayout.WEST);
 
-        menuPanel.setBackground(Color.blue);
-        // add label at top of panel
-        JLabel label = new JLabel("Menu");
-        label.setForeground(Color.white);
-        menuPanel.add(label, BorderLayout.CENTER);
-        // add button that does things
-        Button button1 = new Button("Button 1");
-        menuPanel.add(button1);
-        // add second button that does things
-        Button button2 = new Button("Button 2");
-        menuPanel.add(button2);
-        // add third button that does things
-        Button button3 = new Button("Button 3");
-        menuPanel.add(button3);
-        // set panel size
-        menuPanel.setPreferredSize(new Dimension(85,600));
-
+        menuPanel.setBackground(Color.BLUE);
         //------------------Start of Search Panel----------------------//
         // This panel will contain all information related to search queries
         searchPanel = new JPanel();
@@ -292,7 +268,7 @@ class Interface {
         cardPanel.add(searchPanel, "searchPanel");
 
         // Create Search Label
-        JLabel searchLabel = new JLabel("Search:");
+        JLabel searchLabel = new JLabel("Equipment ID:");
         searchLabel.setForeground(Color.DARK_GRAY);
 
         // Create Text pane to display search results
@@ -303,12 +279,21 @@ class Interface {
         //Create Scroll pane for search results
         searchScroll = new JScrollPane(searchTextArea);
 
-
+        // Create text field box that will be used to search for equipment
         eqSearchTextField = createJTextField();
         eqSearchTextField.addActionListener(new ActionListener() {
+            // This action listener will take the text in the box and pass it to the database getEquipment method in ECSConsole
             @Override
             public void actionPerformed(ActionEvent search) {
-                searchTextArea.setText(String.valueOf(ECSConsole.db.getEquipment(Integer.parseInt(eqSearchTextField.getText()))));
+                // Set the search result text area
+                searchTextArea.setText(
+                        // Convert the results to a readable string
+                        String.valueOf(
+                                // Call getEquipment method of the DB object in ECSConsole
+                                ECSConsole.db.getEquipment(
+                                        // Attempt to convert the text integer to search for equipment via ID
+                                        Integer.parseInt(eqSearchTextField.getText()))));
+                // Clear the search text field for the next search
                 eqSearchTextField.setText("");
             }});
 
@@ -316,7 +301,7 @@ class Interface {
         //add previously created items to the panel
         searchPanel.add(searchLabel, BorderLayout.NORTH);
         searchPanel.add(eqSearchTextField, BorderLayout.NORTH);
-        searchPanel.add(searchScroll, BorderLayout.CENTER);
+        searchPanel.add(searchScroll, BorderLayout.SOUTH);
 
 
         // Centers the created window in the center of the main monitor
@@ -328,14 +313,10 @@ class Interface {
     }
 
     //----------------------- Create and configure generic JTextField -------------------//
-
+    // This can be used to create every JTextField that will be used
     public JTextField createJTextField() {
         JTextField textField = new JTextField(10);
-
-        textField.setFont(new Font("Arial", Font.BOLD, 16));
-
-
-
+        textField.setFont(new Font("Arial",Font.PLAIN, 16));
         return textField;
     }
 
