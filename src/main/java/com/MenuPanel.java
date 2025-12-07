@@ -23,6 +23,7 @@ class MenuPanel {
     public static JPanel initMenuPanel() {
         panel = new JPanel();
         panel.setLayout(new GridBagLayout());
+        panel.setBackground(Color.BLUE);
         GridBagConstraints menuGbc = new GridBagConstraints();
         menuGbc.insets = new Insets(5, 5, 5, 5);
 
