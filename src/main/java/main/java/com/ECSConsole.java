@@ -1,9 +1,14 @@
 package com;
 
+import com.DatabaseManager;
+
 import java.sql.SQLException;
 import java.util.*;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
+import java.awt.event.ActionListener;
+import java.util.List;
 
 /**
  * GB Manufacturing - Equipment Checkout System (ECS)
@@ -35,22 +40,22 @@ public class ECSConsole {
         }
     }
 
+    // Version number, used to determine if the menu should be run or not
+    private static final double version = 0.1;
+    // Used to test the GUI will later be changed to a CLI mode to allow for simpler CLI implementations
+    private static final boolean guiMode = true;
+
 
     public static void main(String[] args) {
 
         // Determines if program should be run in CLI mode or GUI mode.
         //Run the GUI on single thread as the used JavaSwing is not thread safe.
         SwingUtilities.invokeLater(() -> {
-            Authentication authFrame = new Authentication();
-            authFrame.initAuth();
-            authFrame.show();
-
-            /*Interface mainFrame = new Interface();
-            mainFrame.initWindow();
-            mainFrame.show();*/
-
+            Interface mainFrame = new Interface();
+            mainFrame.show();
         });
     }
+
     // This is the GUI, eventually this will become the meat of the main class, this will query a class that exist for the
 // purpose of interacting with the databases and updating information. The main class will then no longer directly
 // manipulate the Database.
@@ -64,11 +69,10 @@ public class ECSConsole {
         private JPanel checkoutPanel;
         private JTextPane searchTextArea;
         private JScrollPane searchScroll;
-        private boolean supervisor;
 
         // Launches the application window
         public Interface() {
-            window = AppWindow.initWindow();
+            window = com.AppWindow.initWindow();
         }
 
         // defines what the window will contain and where those items will be located
@@ -81,12 +85,6 @@ public class ECSConsole {
             window.add(cardPanel, BorderLayout.CENTER); // Adds to the center panel in the
             //Call the MenuPanel class and add the resulting panel into the window
 
-            JPanel searchPanel = SearchPanel.initSearchPanel();
-            cardPanel.add(searchPanel, "search");
-
-
-
-
 
             // Centers the created window in the center of the main monitor
             window.setLocationRelativeTo(null); // Centers the window on the main screen.
@@ -95,13 +93,5 @@ public class ECSConsole {
         public void show() {
             window.setVisible(true);
         }
-
-        public boolean getSupervisor() {
-            return this.supervisor;
-        }
-        public void setSupervisor(boolean supervisor) {
-            this.supervisor = supervisor;
-        }
     }
-
 }

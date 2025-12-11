@@ -1,23 +1,28 @@
-package main.java.com;
+package com;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
+
+import static com.ECSConsole.db;
 
 public class SearchPanel {
     private static JPanel searchPanel;
     private static JTextPane searchTextArea;
     private static JScrollPane searchScroll;
-    private static JTextField eqSearchTextField;
+    private static JTextField eqSearchTextField, skillSearchTextField;
 
     public static JPanel initSearchPanel() {
         searchPanel = new JPanel();
         searchPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 5));
 
-        // Create Search Label
-        JLabel searchLabel = new JLabel("Equipment ID:");
-        searchLabel.setForeground(Color.DARK_GRAY);
+        // Create Search Labels
+        JLabel idSearchLabel = new JLabel("Equipment ID: ");
+        idSearchLabel.setForeground(Color.DARK_GRAY);
+        JLabel skillSearchLabel = new JLabel("Required Skill: ");
+        skillSearchLabel.setForeground(Color.DARK_GRAY);
 
         // Create Text pane to display search results
         searchTextArea = new JTextPane();
@@ -34,13 +39,38 @@ public class SearchPanel {
             @Override
             public void actionPerformed(ActionEvent search) {
                 // Set the search result text area
-                searchTextArea.setText(
-                        // Convert the results to a readable string
-                        String.valueOf(
-                                // Call getEquipment method of the DB object in ECSConsole
-                                ECSConsole.db.getEquipment(
-                                        // Attempt to convert the text integer to search for equipment via ID
-                                        Integer.parseInt(eqSearchTextField.getText()))));
+                try {
+                    searchTextArea.setText(
+                            // Convert the results to a readable string
+                            String.valueOf(
+                                    // Call getEquipment method of the DB object in ECSConsole
+                                    db.idSearch(
+                                            // Attempt to convert the text integer to search for equipment via ID
+                                            Integer.parseInt(eqSearchTextField.getText()))));
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                // Clear the search text field for the next search
+                eqSearchTextField.setText("");
+            }
+        });
+
+        // Create text field box that will be used to search for equipment
+        skillSearchTextField = createJTextField();
+        skillSearchTextField.addActionListener(new ActionListener() {
+            // This action listener will take the text in the box and pass it to the database getEquipment method in ECSConsole
+            @Override
+            public void actionPerformed(ActionEvent search) {
+                // Set the search result text area
+                try {
+                    searchTextArea.setText(
+                            // Convert the results to a readable string
+                            String.valueOf(
+                                    //
+                                    db.skillSearch(skillSearchTextField.getText())));
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
                 // Clear the search text field for the next search
                 eqSearchTextField.setText("");
             }
@@ -48,8 +78,10 @@ public class SearchPanel {
 
 
         //add previously created items to the panel
-        searchPanel.add(searchLabel, BorderLayout.NORTH);
+        searchPanel.add(idSearchLabel, BorderLayout.NORTH);
         searchPanel.add(eqSearchTextField, BorderLayout.NORTH);
+        searchPanel.add(skillSearchLabel, BorderLayout.SOUTH);
+        searchPanel.add(skillSearchTextField, BorderLayout.SOUTH);
         searchPanel.add(searchScroll, BorderLayout.SOUTH);
         return searchPanel;
     }
@@ -61,4 +93,6 @@ public class SearchPanel {
         textField.setFont(new Font("Arial", Font.PLAIN, 16));
         return textField;
     }
+
+
 }

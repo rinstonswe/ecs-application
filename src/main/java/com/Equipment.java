@@ -1,4 +1,4 @@
-package main.java.com;
+package com;
 
 class Equipment {
     private final int id; //unique identifier for specific piece of equipment

@@ -1,4 +1,4 @@
-package main.java.com;
+package com;
 
 import java.util.*;
 import javax.swing.*;
@@ -6,7 +6,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.event.ActionListener;
 
-class MenuPanel {
+public class MenuPanel {
     private static JPanel panel;
 
     private static JButton makeButton(String text, Dimension buttonSize){
