@@ -2,8 +2,6 @@ package com;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.Arrays;
 
@@ -12,9 +10,9 @@ import static com.ECSConsole.db;
 public class Authentication {
     static JFrame authWindow = new  JFrame("Login");
     static JPanel authPanel;
-    static JLabel login = new JLabel("Login");
+    static JLabel login = new JLabel("User ID");
     static JLabel password = new JLabel("Password");
-    static JTextField username = new JTextField();
+    static JTextField id = new JTextField();
     static JPasswordField password1 = new JPasswordField();
     static JButton loginButton = new JButton("Login");
 
@@ -29,39 +27,46 @@ public class Authentication {
         c.insets = new Insets(10,10,10,10);
         c.anchor = GridBagConstraints.WEST;
 
-        username.setPreferredSize(new Dimension(100, 20));
+        id.setPreferredSize(new Dimension(100, 20));
         password1.setPreferredSize(new Dimension(100, 20));
+        password1.addActionListener(e -> loginButton.doClick());
 
         loginButton.addActionListener(
                 e -> {
-                    String user = username.getText();
-                    String pass = Arrays.toString(password1.getPassword());
-                    boolean supervisor = false;
-                    boolean passed = false;
-                    while (!passed) {
+                    int user = Integer.parseInt(id.getText());
+                    String pass = new String(password1.getPassword());
 
-                        try {
-                            supervisor = ECSConsole.db.isSuper(user);
-                        } catch (SQLException ex) {
-                            throw new RuntimeException(ex);
-                        }
-                        try {
-                            if (db.auth(user, pass)) {
-                                authWindow.setVisible(false);
-                                passed = true;
-                            } else {
-                                JOptionPane.showMessageDialog(authWindow, "Wrong username or password");
-                            }
-                        } catch (SQLException ex) {
-                            throw new RuntimeException(ex);
-                        }
+                    boolean supervisor;
+                    boolean passed;
+
+                    try {
+                        supervisor = ECSConsole.db.isSuper(user);
+                        System.out.println("Super?" + supervisor);
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
                     }
-                    ECSConsole.Interface mainFrame = new ECSConsole.Interface();
-                    mainFrame.setSupervisor(supervisor);
-                    mainFrame.initWindow();
-                    mainFrame.show();
-                }
-        );
+                    try {
+                        passed = db.auth(user, pass);
+                        System.out.println("Passed?" + user + pass);
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    if (passed) {
+                        authWindow.setVisible(false);
+
+                        ECSConsole.Interface mainFrame = new ECSConsole.Interface();
+                        mainFrame.setSupervisor(supervisor);
+                        mainFrame.initWindow();
+                        mainFrame.show();
+                    } else {
+                        JOptionPane.showMessageDialog(authWindow, "Wrong id or password");
+                    }
+
+                    // Clear password array for security
+                    Arrays.fill(password1.getPassword(), '\0');
+                });
+
+
 
 
         c.gridx = 1;
@@ -72,11 +77,12 @@ public class Authentication {
         c.gridx = 2;
         c.gridy = 1;
         c.gridwidth = 2;
-        authPanel.add(username, c);
+        authPanel.add(id, c);
         c.gridy = 3;
         authPanel.add(password1, c);
         c.gridy = 5;
         authPanel.add(loginButton, c);
+        authWindow.getRootPane().setDefaultButton(loginButton);
         authWindow.add(authPanel);
 
         show();

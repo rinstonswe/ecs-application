@@ -12,17 +12,20 @@ public class SearchPanel {
     private static JPanel searchPanel;
     private static JTextPane searchTextArea;
     private static JScrollPane searchScroll;
-    private static JTextField eqSearchTextField, skillSearchTextField;
+    private static JTextField eqSearchTextField, skillSearchTextField, nameSearchTextField;
 
     public static JPanel initSearchPanel() {
         searchPanel = new JPanel();
-        searchPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        searchPanel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
 
         // Create Search Labels
         JLabel idSearchLabel = new JLabel("Equipment ID: ");
         idSearchLabel.setForeground(Color.DARK_GRAY);
         JLabel skillSearchLabel = new JLabel("Required Skill: ");
         skillSearchLabel.setForeground(Color.DARK_GRAY);
+        JLabel nameSearchLabel = new JLabel("Required Skill: ");
+        nameSearchLabel.setForeground(Color.DARK_GRAY);
 
         // Create Text pane to display search results
         searchTextArea = new JTextPane();
@@ -72,17 +75,55 @@ public class SearchPanel {
                     throw new RuntimeException(e);
                 }
                 // Clear the search text field for the next search
-                eqSearchTextField.setText("");
+                skillSearchTextField.setText("");
+            }
+        });
+
+        nameSearchTextField = createJTextField();
+        nameSearchTextField.addActionListener(new ActionListener() {
+            // This action listener will take the text in the box and pass it to the database getEquipment method in ECSConsole
+            @Override
+            public void actionPerformed(ActionEvent search) {
+                // Set the search result text area
+                try {
+                    searchTextArea.setText(
+                            // Convert the results to a readable string
+                            String.valueOf(
+                                    //
+                                    db.nameSearch(skillSearchTextField.getText())));
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                // Clear the search text field for the next search
+                nameSearchTextField.setText("");
             }
         });
 
 
         //add previously created items to the panel
-        searchPanel.add(idSearchLabel, BorderLayout.NORTH);
-        searchPanel.add(eqSearchTextField, BorderLayout.NORTH);
-        searchPanel.add(skillSearchLabel, BorderLayout.SOUTH);
-        searchPanel.add(skillSearchTextField, BorderLayout.SOUTH);
-        searchPanel.add(searchScroll, BorderLayout.SOUTH);
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        searchPanel.add(idSearchLabel, gbc);
+        gbc.gridx = 2;
+        gbc.width = 2;
+        searchPanel.add(eqSearchTextField, gbc);
+        gbc.gridy = 2;
+        gbc.gridx = 1;
+        gbc.width = 1;
+        searchPanel.add(skillSearchLabel, gbc);
+        gbc.gridx = 2;
+        gbc.width = 2;
+        searchPanel.add(skillSearchTextField, gbc);
+        gbc.gridy = 3;
+        gbc.gridx = 1;
+        gbc.width = 1;
+        searchPanel.add(nameSearchLabel, gbc);
+        gbc.gridx = 2;
+        gbc.width = 1;
+        searchPanel.add(nameSearchTextField, gbc);
+        gbc.gridy = 2;
+        gbc.gridx = 1;
+        searchPanel.add(searchScroll, gbc);
         return searchPanel;
     }
 
