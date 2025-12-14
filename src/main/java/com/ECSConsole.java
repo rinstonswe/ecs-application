@@ -58,10 +58,7 @@ public class ECSConsole {
         //create the variables corresponding to the pieces that will make up the primary GUI window
         private JFrame window;
         private JTextField eqSearchTextField;
-        private JPanel cardPanel;
-        private JPanel searchPanel;
-        private JPanel reportPanel;
-        private JPanel checkoutPanel;
+        private JPanel cardPanel, equipPanel, empPanel, searchPanel, reportPanel, checkoutPanel;
         private JTextPane searchTextArea;
         private JScrollPane searchScroll;
         private boolean supervisor;
@@ -80,8 +77,18 @@ public class ECSConsole {
 
             window.add(cardPanel, BorderLayout.CENTER); // Adds to the center panel in the
             //Call the MenuPanel class and add the resulting panel into the window
-
-            JPanel searchPanel = SearchPanel.initSearchPanel();
+            equipPanel = EquipSearchPanel.initSearchPanel();
+            searchPanel = new JPanel();
+            if(supervisor) {
+                empPanel = EmpSearchPanel.initEmpSearchPanel();
+                searchPanel.setLayout(new GridLayout(2, 1));
+                searchPanel.add(equipPanel);
+                searchPanel.add(empPanel);
+            }
+            else{
+                searchPanel.setLayout(new GridLayout(1, 1));
+                searchPanel.add(equipPanel);
+            }
             cardPanel.add(searchPanel, "search");
 
 

@@ -8,122 +8,104 @@ import java.sql.SQLException;
 
 import static com.ECSConsole.db;
 
-public class SearchPanel {
+public class EquipSearchPanel {
     private static JPanel searchPanel;
     private static JTextPane searchTextArea;
     private static JScrollPane searchScroll;
-    private static JTextField eqSearchTextField, skillSearchTextField, nameSearchTextField;
+    private static JTextField equipmentIdField, requiredSkillField, nameField;
 
     public static JPanel initSearchPanel() {
         searchPanel = new JPanel();
         searchPanel.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
 
         // Create Search Labels
         JLabel idSearchLabel = new JLabel("Equipment ID: ");
         idSearchLabel.setForeground(Color.DARK_GRAY);
         JLabel skillSearchLabel = new JLabel("Required Skill: ");
         skillSearchLabel.setForeground(Color.DARK_GRAY);
-        JLabel nameSearchLabel = new JLabel("Required Skill: ");
+        JLabel nameSearchLabel = new JLabel("Name: ");
         nameSearchLabel.setForeground(Color.DARK_GRAY);
 
         // Create Text pane to display search results
         searchTextArea = new JTextPane();
         searchTextArea.setEditable(false);
-        searchTextArea.setPreferredSize(new Dimension(200, 350));
 
         //Create Scroll pane for search results
         searchScroll = new JScrollPane(searchTextArea);
 
         // Create text field box that will be used to search for equipment
-        eqSearchTextField = createJTextField();
-        eqSearchTextField.addActionListener(new ActionListener() {
+        equipmentIdField = createJTextField();
+        equipmentIdField.addActionListener(new ActionListener() {
             // This action listener will take the text in the box and pass it to the database getEquipment method in ECSConsole
             @Override
             public void actionPerformed(ActionEvent search) {
                 // Set the search result text area
                 try {
                     searchTextArea.setText(
-                            // Convert the results to a readable string
-                            String.valueOf(
-                                    // Call getEquipment method of the DB object in ECSConsole
-                                    db.idSearch(
-                                            // Attempt to convert the text integer to search for equipment via ID
-                                            Integer.parseInt(eqSearchTextField.getText()))));
+                        // Call getEquipment method of the DB object in ECSConsole
+                        db.searchEquipment("id",
+                            // Attempt to convert the text integer to search for equipment via ID
+                            Integer.parseInt(equipmentIdField.getText())));
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
                 // Clear the search text field for the next search
-                eqSearchTextField.setText("");
+                equipmentIdField.setText("");
             }
         });
 
         // Create text field box that will be used to search for equipment
-        skillSearchTextField = createJTextField();
-        skillSearchTextField.addActionListener(new ActionListener() {
+        requiredSkillField = createJTextField();
+        requiredSkillField.addActionListener(new ActionListener() {
             // This action listener will take the text in the box and pass it to the database getEquipment method in ECSConsole
             @Override
             public void actionPerformed(ActionEvent search) {
                 // Set the search result text area
                 try {
                     searchTextArea.setText(
-                            // Convert the results to a readable string
-                            String.valueOf(
-                                    //
-                                    db.skillSearch(skillSearchTextField.getText())));
+                        //
+                        db.searchEquipment("req_skill",requiredSkillField.getText()));
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
                 // Clear the search text field for the next search
-                skillSearchTextField.setText("");
+                requiredSkillField.setText("");
             }
         });
 
-        nameSearchTextField = createJTextField();
-        nameSearchTextField.addActionListener(new ActionListener() {
+        nameField = createJTextField();
+        nameField.addActionListener(new ActionListener() {
             // This action listener will take the text in the box and pass it to the database getEquipment method in ECSConsole
             @Override
             public void actionPerformed(ActionEvent search) {
                 // Set the search result text area
                 try {
                     searchTextArea.setText(
-                            // Convert the results to a readable string
-                            String.valueOf(
-                                    //
-                                    db.nameSearch(skillSearchTextField.getText())));
+                        //
+                        db.searchEquipment("name",nameField.getText()));
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
                 // Clear the search text field for the next search
-                nameSearchTextField.setText("");
+                nameField.setText("");
             }
         });
 
 
         //add previously created items to the panel
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        searchPanel.add(idSearchLabel, gbc);
-        gbc.gridx = 2;
-        gbc.width = 2;
-        searchPanel.add(eqSearchTextField, gbc);
-        gbc.gridy = 2;
-        gbc.gridx = 1;
-        gbc.width = 1;
-        searchPanel.add(skillSearchLabel, gbc);
-        gbc.gridx = 2;
-        gbc.width = 2;
-        searchPanel.add(skillSearchTextField, gbc);
-        gbc.gridy = 3;
-        gbc.gridx = 1;
-        gbc.width = 1;
-        searchPanel.add(nameSearchLabel, gbc);
-        gbc.gridx = 2;
-        gbc.width = 1;
-        searchPanel.add(nameSearchTextField, gbc);
-        gbc.gridy = 2;
-        gbc.gridx = 1;
-        searchPanel.add(searchScroll, gbc);
+        searchPanel.add(idSearchLabel, gbc(0, 0, 1, 1, 0));
+        searchPanel.add(equipmentIdField, gbc(1, 0, 2, 1, 0));
+
+        searchPanel.add(skillSearchLabel, gbc(0, 1, 1, 1, 0));
+        searchPanel.add(requiredSkillField, gbc(1, 1, 2, 1, 0));
+
+        searchPanel.add(nameSearchLabel, gbc(0, 2, 1, 1, 0));
+        searchPanel.add(nameField, gbc(1, 2, 2, 1, 0));
+
+        GridBagConstraints c = gbc(3,0,2,4, 1);
+        c.weightx = 1.0;
+        searchPanel.add(searchScroll, c);
+
         return searchPanel;
     }
 
@@ -133,6 +115,18 @@ public class SearchPanel {
         JTextField textField = new JTextField(10);
         textField.setFont(new Font("Arial", Font.PLAIN, 16));
         return textField;
+    }
+
+    private static GridBagConstraints gbc(int x, int y, int w, int h, int z) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = x;
+        gbc.gridy = y;
+        gbc.gridwidth = w;
+        gbc.gridheight = h;
+        gbc.weighty = z;
+        gbc.insets = new Insets(10, 10, 10, 10); // top, left, bottom, right
+        gbc.fill = GridBagConstraints.BOTH;
+        return gbc;
     }
 
 

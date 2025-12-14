@@ -18,7 +18,7 @@ public class AppWindow {
         appWindow.setResizable(false);
 
         menuPanel = com.MenuPanel.initMenuPanel();
-        searchPanel = com.SearchPanel.initSearchPanel();
+        searchPanel = EquipSearchPanel.initSearchPanel();
 
         JPanel cardPanel = cardPanel();
 

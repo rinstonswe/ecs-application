@@ -100,51 +100,101 @@ public class DatabaseManager {
     }
 
 //------------------------- Search Helpers -------------------------
-    public String idSearch(int equipmentId) throws SQLException {
-        try (PreparedStatement ps = conn.prepareStatement(
-                "SELECT * FROM Equipment WHERE id = ?")) {
-            ps.setInt(1, equipmentId);
-            ResultSet rs = ps.executeQuery();
-            return String.format(("ID: %d | Name: %s | Requires: %s"),
+public String searchEquipment(String field, Object value) throws SQLException {
+
+    // Base SELECT shared by all searches
+    String baseSql = """
+        SELECT
+            id,
+            name,
+            req_skill
+        FROM equipment
+        """;
+
+    // Build WHERE clause dynamically
+    String where;
+    switch (field) {
+        case "id" -> where = "WHERE id = ?";
+        case "name" -> where = "WHERE name LIKE ?";
+        case "req_skill" -> where = "WHERE req_skill LIKE ?";
+        default -> throw new IllegalArgumentException("Invalid search field: " + field);
+    }
+
+    String sql = baseSql + " " + where;
+
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        // Bind parameters
+        if (field.equals("id")) {
+            ps.setInt(1, (int) value);
+        } else {
+            ps.setString(1, "%" + value + "%");
+        }
+
+        ResultSet rs = ps.executeQuery();
+
+        StringBuilder out = new StringBuilder();
+        while (rs.next()) {
+            out.append(String.format(
+                    "ID: %d | Name: %s | Requires: %s%n",
                     rs.getInt("id"),
                     rs.getString("name"),
-                    rs.getString("req_skill"));
-
+                    rs.getString("req_skill")
+            ));
         }
+
+        return out.toString();
     }
+}
 
-    public String skillSearch(String skill) throws SQLException {
-        try (PreparedStatement ps = conn.prepareStatement(
-                "SELECT * FROM Equipment WHERE required_skill LIKE ?")) {
+    public String searchEmployees(String field, Object value) throws SQLException {
 
-            ps.setString(1, "%" + skill + "%");
-            ResultSet rs = ps.executeQuery();
+        // Base SELECT block shared by all searches
+        String baseSql = """
+        SELECT
+            id,
+            name,
+            skills,
+            CASE
+                WHEN supervisor = 1 THEN 'Supervisor'
+                ELSE 'Standard'
+            END AS role
+        FROM employees
+        """;
 
-            StringBuilder out = new StringBuilder();
-            while (rs.next()) {
-                out.append(String.format("ID: %d | Name: %s | Requires: %s%n",
-                        rs.getInt("id"),
-                        rs.getString("name"),
-                        rs.getString("required_skill")));
+        // Build WHERE clause dynamically
+        String where;
+        switch (field) {
+            case "id" -> where = "WHERE id = ?";
+            case "name" -> where = "WHERE name LIKE ?";
+            case "skills" -> where = "WHERE skills LIKE ?";
+            default -> throw new IllegalArgumentException("Invalid search field: " + field);
+        }
+
+        String sql = baseSql + where;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            // Bind parameters
+            if (field.equals("id")) {
+                ps.setInt(1, (int) value);
+            } else {
+                ps.setString(1, "%" + value + "%");
             }
 
-            return out.toString();
-        }
-    }
+            System.out.println(sql);
 
-    public String nameSearch(String name) throws SQLException {
-        try (PreparedStatement ps = conn.prepareStatement(
-                "SELECT * FROM Equipment WHERE name LIKE ?")) {
-
-            ps.setString(1, "%" + name + "%");
             ResultSet rs = ps.executeQuery();
 
             StringBuilder out = new StringBuilder();
             while (rs.next()) {
-                out.append(String.format("ID: %d | Name: %s | Requires: %s%n",
+                out.append(String.format(
+                        "ID: %d | Name: %s | Skills: %s | Role: %s%n",
                         rs.getInt("id"),
                         rs.getString("name"),
-                        rs.getString("required_skill")));
+                        rs.getString("skills"),
+                        rs.getString("role")
+                ));
             }
 
             return out.toString();
