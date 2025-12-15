@@ -15,12 +15,11 @@ public class MenuPanel {
         button.setMaximumSize(buttonSize);
         button.setMinimumSize(buttonSize);
         button.setMargin(new Insets(0,0,0,0));
-        button.addActionListener(e -> {});
         button.setFont(new Font("Arial", Font.PLAIN, 10));
         return button;
     };
 
-    public static JPanel initMenuPanel() {
+    public static JPanel initMenuPanel(CardLayout layout, JPanel cardPanel) {
         panel = new JPanel();
         panel.setLayout(new GridBagLayout());
         panel.setBackground(Color.BLUE);
@@ -40,18 +39,21 @@ public class MenuPanel {
 
         // button to switch to searchPanel in cardLayout
         JButton searchMenuButton = makeButton("Search", buttonSize);
+        searchMenuButton.addActionListener(e -> layout.show(cardPanel,"search"));
         menuGbc.gridx = 0;
         menuGbc.gridy = 1;
         panel.add(searchMenuButton, menuGbc);
 
         // add second button that does things
         JButton checkoutButton = makeButton("Checkout", buttonSize);
+        checkoutButton.addActionListener(e -> layout.show(cardPanel,"checkout"));
         menuGbc.gridx = 0;
         menuGbc.gridy = 2;
         panel.add(checkoutButton,menuGbc);
 
         // add third button that does things
         JButton reportButton = makeButton("Reports", buttonSize);
+        searchMenuButton.addActionListener(e -> layout.show(cardPanel,"reports"));
         menuGbc.gridx = 0;
         menuGbc.gridy = 3;
         panel.add(reportButton,menuGbc);

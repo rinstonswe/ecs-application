@@ -4,35 +4,94 @@ import javax.swing.*;
 import java.awt.*;
 
 public class AppWindow {
-    public static JFrame appWindow;
-    public static JPanel menuPanel, searchPanel;
 
-    public static JFrame initWindow() {
-        appWindow = new JFrame();
+    private JFrame window;
+    private JPanel menuPanel;
+    private JPanel cardPanel;
+    private JPanel searchPanel;
+    private JPanel equipPanel;
+    private JPanel empPanel;
+    private CardLayout cardLayout = new CardLayout();
+    private CheckoutPanel checkoutPanel;
 
-        //Set window default behavior
-        appWindow.setTitle("Equipment Checkout System"); //Title shown at top of window
-        appWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //Terminates window
-        appWindow.setSize(800, 600); //Sets default application size to 800x600 pixels
-        appWindow.setLayout(new BorderLayout()); //Sets window layout to Boarder
-        appWindow.setResizable(false);
+    private boolean supervisor;
+    private int user;
 
-        menuPanel = com.MenuPanel.initMenuPanel();
-        searchPanel = EquipSearchPanel.initSearchPanel();
 
-        JPanel cardPanel = cardPanel();
+    public AppWindow(int user, boolean supervisor) {
+        setUser(user);
+        setSupervisor(supervisor);
 
-        appWindow.add(menuPanel, BorderLayout.WEST);
-        appWindow.add(cardPanel, BorderLayout.CENTER);
-        appWindow.setLocationRelativeTo(null);
-
-        return appWindow;
+        buildWindow();
+        buildCards();
+        buildMenu();
     }
 
-    static JPanel cardPanel() {
-        JPanel cardPanel = new JPanel();
-        cardPanel.setLayout(new CardLayout());
-        cardPanel.add(searchPanel, "searchPanel");
-        return cardPanel;
+    //------------------------------- Build the main application window -------------------------------
+    private void buildWindow() {
+        window = new JFrame("Equipment Checkout System");
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.setSize(800, 600);
+        window.setLayout(new BorderLayout());
+        window.setResizable(false);
+        window.setLocationRelativeTo(null);
+    }
+
+    //------------------------------- Build the left-side menu panel -------------------------------
+    private void buildMenu() {
+        menuPanel = MenuPanel.initMenuPanel(cardLayout, cardPanel);
+        window.add(menuPanel, BorderLayout.WEST);
+    }
+
+    //------------------------------- Build the card panel (center) -------------------------------
+    private void buildCards() {
+        cardPanel = new JPanel(cardLayout);
+
+        // Equipment search panel
+        equipPanel = EquipSearchPanel.initSearchPanel();
+
+        // Combined search panel (equipment + employee if supervisor)
+        searchPanel = new JPanel();
+        if (supervisor) {
+            empPanel = EmpSearchPanel.initEmpSearchPanel();
+            searchPanel.setLayout(new GridLayout(2, 1));
+            searchPanel.add(equipPanel);
+            searchPanel.add(empPanel);
+        } else {
+            searchPanel.setLayout(new GridLayout(1, 1));
+            searchPanel.add(equipPanel);
+        }
+
+        // Checkout panel
+        checkoutPanel = new CheckoutPanel(user);
+
+        // Add cards
+        cardPanel.add(searchPanel, "search");
+        cardPanel.add(checkoutPanel.initCheckoutPanel(), "checkout");
+
+        window.add(cardPanel, BorderLayout.CENTER);
+    }
+
+    //------------------------------- Show the window -------------------------------
+    public void show() {
+        window.setVisible(true);
+    }
+
+    //------------------------------- Supervisor flag -------------------------------
+    public boolean isSupervisor() {
+        return supervisor;
+    }
+
+    public void setSupervisor(boolean supervisor) {
+        this.supervisor = supervisor;
+    }
+
+    //------------------------------- Logged-in user ID -------------------------------
+    public int getUser() {
+        return user;
+    }
+
+    public void setUser(int user) {
+        this.user = user;
     }
 }

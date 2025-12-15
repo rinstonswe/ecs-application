@@ -41,22 +41,18 @@ public class Authentication {
 
                     try {
                         supervisor = ECSConsole.db.isSuper(user);
-                        System.out.println("Super?" + supervisor);
                     } catch (SQLException ex) {
                         throw new RuntimeException(ex);
                     }
                     try {
                         passed = db.auth(user, pass);
-                        System.out.println("Passed?" + user + pass);
                     } catch (SQLException ex) {
                         throw new RuntimeException(ex);
                     }
                     if (passed) {
                         authWindow.setVisible(false);
 
-                        ECSConsole.Interface mainFrame = new ECSConsole.Interface();
-                        mainFrame.setSupervisor(supervisor);
-                        mainFrame.initWindow();
+                        AppWindow mainFrame = new AppWindow(user,supervisor);
                         mainFrame.show();
                     } else {
                         JOptionPane.showMessageDialog(authWindow, "Wrong id or password");
