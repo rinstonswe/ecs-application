@@ -1,9 +1,10 @@
 package com;
 
 import java.sql.SQLException;
-import java.util.*;
-import javax.swing.*;
-import java.awt.*;
+
+import javax.swing.SwingUtilities;
+
+import com.ui.Authentication;
 
 /**
  * GB Manufacturing - Equipment Checkout System (ECS)
@@ -22,8 +23,6 @@ import java.awt.*;
  */
 
 public class ECSConsole {
-    // Default scanner object for simplification
-    private static final Scanner scanner = new Scanner(System.in);
     // Create database object
     public static final DatabaseManager db;
 
@@ -42,7 +41,6 @@ public class ECSConsole {
         //Run the GUI on single thread as the used JavaSwing is not thread safe.
         SwingUtilities.invokeLater(() -> {
             Authentication authFrame = new Authentication();
-            authFrame.initAuth();
             authFrame.show();
 
         });

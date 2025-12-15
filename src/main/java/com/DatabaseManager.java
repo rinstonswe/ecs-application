@@ -1,9 +1,13 @@
 package com;
 
-import de.mkammerer.argon2.Argon2;
-import de.mkammerer.argon2.Argon2Factory;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
-import java.sql.*;
+import com.security.PasswordHasher;
 
 /*
 This is a central class to create and manage the database connection
@@ -11,7 +15,7 @@ as well as all database queriesq
  */
 public class DatabaseManager {
     private static final String DB_URL = "jdbc:sqlite:ecs.db";
-    private Connection conn;
+    private final Connection conn;
 
     public DatabaseManager() throws SQLException {
         conn = DriverManager.getConnection(DB_URL);
@@ -202,21 +206,21 @@ public String searchEquipment(String field, Object value) throws SQLException {
     }
 
     //------------------------- Authentication -------------------------
-    public boolean auth(int id, String password) throws SQLException {
-        try (PreparedStatement ps = conn.prepareStatement(
-                "SELECT pass_hash FROM Employees WHERE id = ?")) {
+public boolean auth(int id, String password) throws SQLException {
+    try (PreparedStatement ps = conn.prepareStatement(
+            "SELECT pass_hash FROM Employees WHERE id = ?")) {
 
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
 
-            if (!rs.next()) return false;
+        if (!rs.next()) return false;
 
-            String storedHash = rs.getString("pass_hash");
-            Argon2 argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id);
+        String storedHash = rs.getString("pass_hash");
 
-            return argon2.verify(storedHash, password);
-        }
+        return PasswordHasher.verify(password, storedHash);
     }
+}
+
 
     public boolean isSuper(int id) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement(
