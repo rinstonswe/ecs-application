@@ -65,8 +65,9 @@ public class MenuPanel {
         menuGbc.weighty = 1;
         panel.add(ghostLabel,menuGbc);
 
-        // Application exit button, eventually will be logout button
+        // Application exit button
         JButton exitButton = makeButton("Exit",  buttonSize);
+        exitButton.addActionListener(e -> System.exit(0));
         menuGbc.gridx = 0;
         menuGbc.gridy = 5;
         menuGbc.weighty = 0;

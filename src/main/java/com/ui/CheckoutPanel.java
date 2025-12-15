@@ -1,17 +1,21 @@
 package com.ui;
 
+import com.Employee;
+import com.Equipment;
+
 import javax.swing.*;
 import java.awt.*;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 import static com.ECSConsole.db;
-import static java.lang.Integer.parseInt;
 
 public class CheckoutPanel {
 
     private final int employeeId;
+    private int equipmentId;
     private JTextField equipmentIdField;
-    private JTextPane infoArea;
+    private JTextPane infoTextPane;
     private JButton checkoutButton;
     private JPanel panel, northPanel, centerPanel, southPanel;
 
@@ -20,66 +24,113 @@ public class CheckoutPanel {
     }
 
     public JPanel initCheckoutPanel() {
-        panel = new JPanel();
-        panel.setLayout(new BorderLayout(5, 5));
-
+        panel = new JPanel(new BorderLayout(5, 5));
 
         panel.add(buildNorthPanel(), BorderLayout.NORTH);
         panel.add(buildCenterPanel(), BorderLayout.CENTER);
         panel.add(buildSouthPanel(), BorderLayout.SOUTH);
-        return  panel;
+
+        return panel;
     }
 
     private JButton createCheckoutButton() {
         checkoutButton = new JButton("Checkout");
+        checkoutButton.setEnabled(false);
 
-        return checkoutButton;
-    }
-
-    private JTextPane initInfoArea() {
-        infoArea = new JTextPane();
-
-        return infoArea;
-    }
-
-    private JTextField initIdField() {
-        equipmentIdField = new JTextField();
-
-        equipmentIdField.addActionListener(e -> {
+        checkoutButton.addActionListener(e -> {
             try {
-                db.checkoutEquipment(employeeId, parseInt(equipmentIdField.getText()));
+                db.checkoutEquipment(equipmentId, employeeId);
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
         });
+
+        return checkoutButton;
+    }
+
+    private JTextPane initInfoTextPane() {
+        infoTextPane = new JTextPane();
+        infoTextPane.setEditable(false);
+        infoTextPane.setOpaque(false);
+        infoTextPane.setContentType("text/html");
+        return infoTextPane;
+    }
+
+    private JTextField initIdField() {
+        equipmentIdField = new JTextField();
+        equipmentIdField.setPreferredSize(new Dimension(50, 20));
+
+        equipmentIdField.addActionListener(e -> searchResult());
 
         return equipmentIdField;
     }
 
     private JPanel buildNorthPanel() {
         northPanel = new JPanel();
-
-        JLabel equipmentIdLabel = new JLabel("Equipment ID");
-
-        northPanel.add(equipmentIdLabel);
+        northPanel.add(new JLabel("Equipment ID"));
         northPanel.add(initIdField());
-
         return northPanel;
     }
 
     private JPanel buildCenterPanel() {
         centerPanel = new JPanel();
-
-        centerPanel.add(initInfoArea());
-
+        centerPanel.add(initInfoTextPane());
         return centerPanel;
     }
 
     private JPanel buildSouthPanel() {
         southPanel = new JPanel();
-
         southPanel.add(createCheckoutButton());
-
         return southPanel;
+    }
+
+    private void searchResult() {
+        try {
+            equipmentId = Integer.parseInt(equipmentIdField.getText());
+
+            Equipment equipment = db.getEquipmentById(equipmentId);
+            Employee employee = db.getEmployeeById(employeeId);
+
+            if (equipment == null) {
+                infoTextPane.setText("<html><b>Equipment not found</b></html>");
+                checkoutButton.setEnabled(false);
+                return;
+            }
+
+            boolean match = employee.getSkills().contains(equipment.getRequiredSkill());
+            checkoutButton.setEnabled(match);
+
+            infoTextPane.setText(buildHtml(equipment, match));
+
+        } catch (Exception ex) {
+            infoTextPane.setText("<html><b>Error retrieving equipment</b></html>");
+            checkoutButton.setEnabled(false);
+        }
+    }
+
+    private String buildHtml(Equipment eq, boolean match) {
+        String skillMatchHtml = match
+                ? "<span style='color: green;'>True</span>"
+                : "<span style='color: red;'>False</span>";
+
+        return """
+                <html>
+                    <body style='font-family: sans-serif;'>
+                        <b>EQUIPMENT ID: </b> %s<br>
+                        <b>NAME: </b> %s<br>
+                        <b>REQUIRED SKILL: </b> %s<br>
+                        <b>SKILL MATCH: </b> %s<br>
+                        <b>CHECKOUT DATE: </b> %s<br>
+                        <b>RETURN DATE: </b> %s
+                    </body>
+                </html>
+                """.formatted(
+                eq.getId(),
+                eq.getName(),
+                eq.getRequiredSkill(),
+                skillMatchHtml,
+                LocalDate.now(),
+                LocalDate.now().plusDays(5)
+        );
     }
 }

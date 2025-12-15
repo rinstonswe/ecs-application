@@ -1,54 +1,43 @@
 package com;
 
-class Equipment {
-    private final int id; //unique identifier for specific piece of equipment
-    private final String name; //name of equipment
-    private final String requiredSkill; //required skills to be able to use equipment
-    private boolean isCheckedOut; // checkout status for reference in other classes
-    private Employee currentHolder; //used for tracking purposes
-    private Employee lastHolder; //also for tracking purposes in report generation
+public class Equipment {
 
-    //Constructor
-    public Equipment(int id, String name, String requiredSkill) {
+    private final int id;              // unique identifier
+    private final String name;         // equipment name
+    private final String requiredSkill; // skill needed to use it
+    private final boolean isCheckedOut; // from DB: 0 = false, 1 = true
+
+    public Equipment(int id, String name, String requiredSkill, boolean isCheckedOut) {
         this.id = id;
         this.name = name;
         this.requiredSkill = requiredSkill;
-        this.isCheckedOut = false;
+        this.isCheckedOut = isCheckedOut;
     }
 
-    //Getters and setters
-    public int getId() { return id; }
-
-    public String getName() { return name; }
-
-    public String getRequiredSkill() { return requiredSkill; }
-
-    public boolean getIsCheckedOut() { return isCheckedOut; }
-
-    public Employee getCurrentHolder() { return currentHolder; }
-
-    public Employee getLastHolder() { return lastHolder; }
-
-    // Checkout method
-    public void checkout(Employee e) {
-        this.isCheckedOut = true;
-        this.currentHolder = e;
-        this.lastHolder = e;
+    public int getId() {
+        return id;
     }
 
-    // Check in method
-    public void checkin() {
-        this.isCheckedOut = false;
-        this.currentHolder = null;
+    public String getName() {
+        return name;
     }
 
-    // toString method overridden to add necessary information
+    public String getRequiredSkill() {
+        return requiredSkill;
+    }
+
+    public boolean isCheckedOut() {
+        return isCheckedOut;
+    }
+
     @Override
     public String toString() {
-        String status = isCheckedOut
-                ? "Checked out by " + currentHolder.getName()
-                : "Available";
-        return String.format("[%d] %s (%s) - %s", id, name,
-                requiredSkill == null ? "No skill required" : "Requires: " + requiredSkill, status);
+        return String.format(
+                "[%d] %s — %s%s",
+                id,
+                name,
+                requiredSkill == null ? "No skill required" : "Requires: " + requiredSkill,
+                isCheckedOut ? " (Checked Out)" : ""
+        );
     }
 }

@@ -1,10 +1,13 @@
 package com.ui;
 
+import com.Equipment;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.ECSConsole.db;
 
@@ -15,84 +18,71 @@ public class EquipSearchPanel {
     private static JTextField equipmentIdField, requiredSkillField, nameField;
 
     public static JPanel initSearchPanel() {
-        searchPanel = new JPanel();
-        searchPanel.setLayout(new GridBagLayout());
+        searchPanel = new JPanel(new GridBagLayout());
 
-        // Create Search Labels
         JLabel idSearchLabel = new JLabel("Equipment ID: ");
         idSearchLabel.setForeground(Color.DARK_GRAY);
+
         JLabel skillSearchLabel = new JLabel("Required Skill: ");
         skillSearchLabel.setForeground(Color.DARK_GRAY);
+
         JLabel nameSearchLabel = new JLabel("Name: ");
         nameSearchLabel.setForeground(Color.DARK_GRAY);
 
-        // Create Text pane to display search results
         searchTextArea = new JTextPane();
         searchTextArea.setEditable(false);
-
-        //Create Scroll pane for search results
         searchScroll = new JScrollPane(searchTextArea);
+        Dimension fixed = new Dimension(400, 260);
+        searchScroll.setPreferredSize(fixed);
+        searchScroll.setMinimumSize(fixed);
 
-        // Create text field box that will be used to search for equipment
+
+
+        // ---------------- Search by ID ----------------
         equipmentIdField = createJTextField();
-        equipmentIdField.addActionListener(new ActionListener() {
-            // This action listener will take the text in the box and pass it to the database getEquipment method in ECSConsole
-            @Override
-            public void actionPerformed(ActionEvent search) {
-                // Set the search result text area
-                try {
-                    searchTextArea.setText(
-                            // Call getEquipment method of the DB object in ECSConsole
-                            db.searchEquipment("id",
-                                    // Attempt to convert the text integer to search for equipment via ID
-                                    Integer.parseInt(equipmentIdField.getText())));
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
+        equipmentIdField.addActionListener((ActionEvent e) -> {
+            try {
+                int id = Integer.parseInt(equipmentIdField.getText());
+                Equipment eq = db.getEquipmentById(id);
+
+                if (eq != null) {
+                    searchTextArea.setText(formatEquipment(eq));
+                } else {
+                    searchTextArea.setText("No equipment found with ID " + id);
                 }
-                // Clear the search text field for the next search
-                equipmentIdField.setText("");
+            } catch (Exception ex) {
+                searchTextArea.setText("Error: " + ex.getMessage());
             }
+            equipmentIdField.setText("");
         });
 
-        // Create text field box that will be used to search for equipment
+        // ---------------- Search by Required Skill ----------------
         requiredSkillField = createJTextField();
-        requiredSkillField.addActionListener(new ActionListener() {
-            // This action listener will take the text in the box and pass it to the database getEquipment method in ECSConsole
-            @Override
-            public void actionPerformed(ActionEvent search) {
-                // Set the search result text area
-                try {
-                    searchTextArea.setText(
-                            //
-                            db.searchEquipment("req_skill",requiredSkillField.getText()));
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-                // Clear the search text field for the next search
-                requiredSkillField.setText("");
+        requiredSkillField.addActionListener((ActionEvent e) -> {
+            try {
+                String skill = requiredSkillField.getText();
+                List<Equipment> results = db.getEquipmentBySkill(skill);
+                searchTextArea.setText(formatEquipmentList(results));
+            } catch (SQLException ex) {
+                searchTextArea.setText("Error: " + ex.getMessage());
             }
+            requiredSkillField.setText("");
         });
 
+        // ---------------- Search by Name ----------------
         nameField = createJTextField();
-        nameField.addActionListener(new ActionListener() {
-            // This action listener will take the text in the box and pass it to the database getEquipment method in ECSConsole
-            @Override
-            public void actionPerformed(ActionEvent search) {
-                // Set the search result text area
-                try {
-                    searchTextArea.setText(
-                            //
-                            db.searchEquipment("name",nameField.getText()));
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-                // Clear the search text field for the next search
-                nameField.setText("");
+        nameField.addActionListener((ActionEvent e) -> {
+            try {
+                String name = nameField.getText();
+                List<Equipment> results = db.getEquipmentByName(name);
+                searchTextArea.setText(formatEquipmentList(results));
+            } catch (SQLException ex) {
+                searchTextArea.setText("Error: " + ex.getMessage());
             }
+            nameField.setText("");
         });
 
-
-        //add previously created items to the panel
+        // Layout
         searchPanel.add(idSearchLabel, gbc(0, 0, 1, 1, 0));
         searchPanel.add(equipmentIdField, gbc(1, 0, 2, 1, 0));
 
@@ -102,15 +92,30 @@ public class EquipSearchPanel {
         searchPanel.add(nameSearchLabel, gbc(0, 2, 1, 1, 0));
         searchPanel.add(nameField, gbc(1, 2, 2, 1, 0));
 
-        GridBagConstraints c = gbc(3,0,2,4, 1);
+        GridBagConstraints c = gbc(3, 0, 2, 4, 1);
         c.weightx = 1.0;
         searchPanel.add(searchScroll, c);
 
         return searchPanel;
     }
 
-    //----------------------- Create and configure generic JTextField -------------------//
-    // This can be used to create every JTextField that will be used
+    private static String formatEquipment(Equipment eq) {
+        return String.format(
+                "ID: %d | Name: %s | Requires: %s | Checked Out: %s",
+                eq.getId(),
+                eq.getName(),
+                eq.getRequiredSkill() == null ? "None" : eq.getRequiredSkill(),
+                eq.isCheckedOut() ? "Yes" : "No"
+        );
+    }
+
+    private static String formatEquipmentList(List<Equipment> list) {
+        if (list.isEmpty()) return "No equipment found.";
+        return list.stream()
+                .map(EquipSearchPanel::formatEquipment)
+                .collect(Collectors.joining("\n"));
+    }
+
     public static JTextField createJTextField() {
         JTextField textField = new JTextField(10);
         textField.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -124,10 +129,8 @@ public class EquipSearchPanel {
         gbc.gridwidth = w;
         gbc.gridheight = h;
         gbc.weighty = z;
-        gbc.insets = new Insets(10, 10, 10, 10); // top, left, bottom, right
+        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.BOTH;
         return gbc;
     }
-
-
 }

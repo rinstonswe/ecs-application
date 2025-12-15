@@ -1,9 +1,11 @@
 package com;
 
 import java.sql.SQLException;
+import java.util.Scanner;
 
 import javax.swing.SwingUtilities;
 
+import com.security.PasswordHasher;
 import com.ui.Authentication;
 
 /**
@@ -36,8 +38,6 @@ public class ECSConsole {
 
 
     public static void main(String[] args) {
-
-        // Determines if program should be run in CLI mode or GUI mode.
         //Run the GUI on single thread as the used JavaSwing is not thread safe.
         SwingUtilities.invokeLater(() -> {
             Authentication authFrame = new Authentication();

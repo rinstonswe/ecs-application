@@ -1,10 +1,13 @@
 package com.ui;
 
+import com.Employee;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.ECSConsole.db;
 
@@ -15,88 +18,73 @@ public class EmpSearchPanel {
     private static JTextField empIdField, skillField, nameField;
 
     public static JPanel initEmpSearchPanel() {
-        searchPanel = new JPanel();
-        searchPanel.setLayout(new GridBagLayout());
+        searchPanel = new JPanel(new GridBagLayout());
 
-        // Create Search Labels
         JLabel idSearchLabel = new JLabel("Employee ID: ");
         idSearchLabel.setForeground(Color.DARK_GRAY);
+
         JLabel skillSearchLabel = new JLabel("Employee Skill: ");
         skillSearchLabel.setForeground(Color.DARK_GRAY);
+
         JLabel nameSearchLabel = new JLabel("Name: ");
         nameSearchLabel.setForeground(Color.DARK_GRAY);
 
-        // Create Text pane to display search results
         searchTextArea = new JTextPane();
         searchTextArea.setEditable(false);
 
-        //Create Scroll pane for search results
         searchScroll = new JScrollPane(searchTextArea);
+        Dimension fixed = new Dimension(400, 260);
+        searchScroll.setPreferredSize(fixed);
+        searchScroll.setMinimumSize(fixed);
+        searchScroll.setHorizontalScrollBarPolicy(
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS
+        );
 
-        // Create text field box that will be used to search for employee by id
+        // ---------------- Search by ID ----------------
         empIdField = createJTextField();
-        empIdField.addActionListener(new ActionListener() {
-            // This action listener will take the text in the box and pass it to the database searchEmployees method
-            @Override
-            public void actionPerformed(ActionEvent search) {
-                // Set the search result text area
-                try {
-                    searchTextArea.setText(
-                            // Call searchEmployees method of the DB
-                            db.searchEmployees("id",
-                                    // Attempt to convert the text integer to search for employee via ID
-                                    Integer.parseInt(empIdField.getText())));
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
+        empIdField.addActionListener((ActionEvent e) -> {
+            try {
+                int id = Integer.parseInt(empIdField.getText());
+                Employee emp = db.getEmployeeById(id);
+
+                if (emp != null) {
+                    searchTextArea.setText(formatEmployee(emp));
+                } else {
+                    searchTextArea.setText("No employee found with ID " + id);
                 }
-                // Clear the search text field for the next search
-                empIdField.setText("");
+            } catch (Exception ex) {
+                searchTextArea.setText("Error: " + ex.getMessage());
             }
+            empIdField.setText("");
         });
 
-        // Create text field box that will be used to search for equipment
+        // ---------------- Search by Skill ----------------
         skillField = createJTextField();
-        skillField.addActionListener(new ActionListener() {
-            // This action listener will take the text in the box and pass it to the database getEquipment method in ECSConsole
-            @Override
-            public void actionPerformed(ActionEvent search) {
-                // Set the search result text area
-                try {
-                    searchTextArea.setText(
-                            // Convert the results to a readable string
-                            String.valueOf(
-                                    //
-                                    db.searchEmployees("skills",skillField.getText())));
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-                // Clear the search text field for the next search
-                skillField.setText("");
+        skillField.addActionListener((ActionEvent e) -> {
+            try {
+                String skill = skillField.getText();
+                List<Employee> results = db.getEmployeesBySkill(skill);
+                searchTextArea.setText(formatEmployeeList(results));
+            } catch (SQLException ex) {
+                searchTextArea.setText("Error: " + ex.getMessage());
             }
+            skillField.setText("");
         });
 
+        // ---------------- Search by Name ----------------
         nameField = createJTextField();
-        nameField.addActionListener(new ActionListener() {
-            // This action listener will take the text in the box and pass it to the database getEquipment method in ECSConsole
-            @Override
-            public void actionPerformed(ActionEvent search) {
-                // Set the search result text area
-                try {
-                    searchTextArea.setText(
-                            // Convert the results to a readable string
-                            String.valueOf(
-                                    //Search based on value in name text field
-                                    db.searchEmployees("name",nameField.getText())));
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-                // Clear the search text field for the next search
-                nameField.setText("");
+        nameField.addActionListener((ActionEvent e) -> {
+            try {
+                String name = nameField.getText();
+                List<Employee> results = db.getEmployeesByName(name);
+                searchTextArea.setText(formatEmployeeList(results));
+            } catch (SQLException ex) {
+                searchTextArea.setText("Error: " + ex.getMessage());
             }
+            nameField.setText("");
         });
 
-
-        //add previously created items to the panel
+        // Layout
         searchPanel.add(idSearchLabel, gbc(0, 0, 1, 1, 0));
         searchPanel.add(empIdField, gbc(1, 0, 2, 1, 0));
 
@@ -106,15 +94,30 @@ public class EmpSearchPanel {
         searchPanel.add(nameSearchLabel, gbc(0, 2, 1, 1, 0));
         searchPanel.add(nameField, gbc(1, 2, 2, 1, 0));
 
-        GridBagConstraints c = gbc(3,0,2,4, 1);
+        GridBagConstraints c = gbc(3, 0, 2, 4, 1);
         c.weightx = 1.0;
         searchPanel.add(searchScroll, c);
 
         return searchPanel;
     }
 
-    //----------------------- Create and configure generic JTextField -------------------//
-    // This can be used to create every JTextField that will be used
+    private static String formatEmployee(Employee emp) {
+        return String.format(
+                "ID: %d | Name: %s | Skills: %s | Role: %s",
+                emp.getId(),
+                emp.getName(),
+                emp.getSkills(),
+                emp.isSupervisor() ? "Supervisor" : "Standard"
+        );
+    }
+
+    private static String formatEmployeeList(List<Employee> list) {
+        if (list.isEmpty()) return "No employees found.";
+        return list.stream()
+                .map(EmpSearchPanel::formatEmployee)
+                .collect(Collectors.joining("\n"));
+    }
+
     public static JTextField createJTextField() {
         JTextField textField = new JTextField(10);
         textField.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -128,10 +131,8 @@ public class EmpSearchPanel {
         gbc.gridwidth = w;
         gbc.gridheight = h;
         gbc.weighty = z;
-        gbc.insets = new Insets(10, 10, 10, 10); // top, left, bottom, right
+        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.BOTH;
         return gbc;
     }
-
-
 }
