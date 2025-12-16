@@ -4,6 +4,7 @@ import com.Employee;
 import com.Equipment;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -15,9 +16,11 @@ public class CheckoutPanel {
     private final int employeeId;
     private int equipmentId;
     private JTextField equipmentIdField;
+    private JTextArea noteField;
     private JTextPane infoTextPane;
     private JButton checkoutButton;
     private JPanel panel, northPanel, centerPanel, southPanel;
+    GridBagConstraints c = new GridBagConstraints();
 
     public CheckoutPanel(int employeeId) {
         this.employeeId = employeeId;
@@ -39,7 +42,9 @@ public class CheckoutPanel {
 
         checkoutButton.addActionListener(e -> {
             try {
-                db.checkoutEquipment(equipmentId, employeeId);
+                db.checkoutEquipment(equipmentId, employeeId, LocalDate.now(), LocalDate.now().plusDays(5), noteField.getText());
+
+                JOptionPane.showMessageDialog(panel, "Checkout successful");
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
@@ -60,7 +65,9 @@ public class CheckoutPanel {
         equipmentIdField = new JTextField();
         equipmentIdField.setPreferredSize(new Dimension(50, 20));
 
-        equipmentIdField.addActionListener(e -> searchResult());
+        equipmentIdField.addActionListener(e -> {
+            searchResult();
+        });
 
         return equipmentIdField;
     }
@@ -73,8 +80,19 @@ public class CheckoutPanel {
     }
 
     private JPanel buildCenterPanel() {
-        centerPanel = new JPanel();
-        centerPanel.add(initInfoTextPane());
+        centerPanel = new JPanel(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        centerPanel.add(initInfoTextPane(), gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weighty = 0.5;
+        centerPanel.add(buildNoteField(), gbc);
+
         return centerPanel;
     }
 
@@ -97,10 +115,12 @@ public class CheckoutPanel {
                 return;
             }
 
-            boolean match = employee.getSkills().contains(equipment.getRequiredSkill());
+            boolean match = (equipment.getRequiredSkill() == null || employee.getSkills().contains(equipment.getRequiredSkill()));
             checkoutButton.setEnabled(match);
 
             infoTextPane.setText(buildHtml(equipment, match));
+
+            noteField.setVisible(true);
 
         } catch (Exception ex) {
             infoTextPane.setText("<html><b>Error retrieving equipment</b></html>");
@@ -132,5 +152,14 @@ public class CheckoutPanel {
                 LocalDate.now(),
                 LocalDate.now().plusDays(5)
         );
+    }
+
+    private JTextArea buildNoteField() {
+        noteField = new JTextArea();
+        noteField.setPreferredSize(new Dimension(300, 150));
+        noteField.setVisible(false);
+        Border border = BorderFactory.createEtchedBorder();
+        noteField.setBorder(border);
+        return noteField;
     }
 }

@@ -44,24 +44,38 @@ public class MenuPanel {
         menuGbc.gridy = 1;
         panel.add(searchMenuButton, menuGbc);
 
-        // add second button that does things
+        // Switch to Check out card
         JButton checkoutButton = makeButton("Checkout", buttonSize);
         checkoutButton.addActionListener(e -> layout.show(cardPanel,"checkout"));
         menuGbc.gridx = 0;
         menuGbc.gridy = 2;
         panel.add(checkoutButton,menuGbc);
 
-        // add third button that does things
+        // Switch to Return Card
+        JButton returnButton = makeButton("Return", buttonSize);
+        returnButton.addActionListener(e -> layout.show(cardPanel,"return"));
+        menuGbc.gridx = 0;
+        menuGbc.gridy = 3;
+        panel.add(returnButton,menuGbc);
+
+        // Switch to Report Card
         JButton reportButton = makeButton("Reports", buttonSize);
         searchMenuButton.addActionListener(e -> layout.show(cardPanel,"reports"));
         menuGbc.gridx = 0;
-        menuGbc.gridy = 3;
+        menuGbc.gridy = 4;
         panel.add(reportButton,menuGbc);
+
+        // Switch to Report Card
+        JButton createButton = makeButton("Add Equip", buttonSize);
+        createButton.addActionListener(e -> layout.show(cardPanel,"create"));
+        menuGbc.gridx = 0;
+        menuGbc.gridy = 5;
+        panel.add(createButton,menuGbc);
 
         //Ghost label to push other items to the top of the panel
         JLabel ghostLabel = new JLabel("");
         menuGbc.gridx = 0;
-        menuGbc.gridy = 4;
+        menuGbc.gridy = 6;
         menuGbc.weighty = 1;
         panel.add(ghostLabel,menuGbc);
 
@@ -69,7 +83,7 @@ public class MenuPanel {
         JButton exitButton = makeButton("Exit",  buttonSize);
         exitButton.addActionListener(e -> System.exit(0));
         menuGbc.gridx = 0;
-        menuGbc.gridy = 5;
+        menuGbc.gridy = 7;
         menuGbc.weighty = 0;
         menuGbc.anchor = GridBagConstraints.SOUTH;
         panel.add(exitButton,menuGbc);

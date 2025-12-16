@@ -8,11 +8,11 @@ public class AppWindow {
     private JFrame window;
     private JPanel menuPanel;
     private JPanel cardPanel;
-    private JPanel searchPanel;
-    private JPanel equipPanel;
-    private JPanel empPanel;
+    private JPanel searchPanel, equipPanel, empPanel;
     private CardLayout cardLayout = new CardLayout();
     private CheckoutPanel checkoutPanel;
+    private ReturnPanel returnPanel;
+    private EquipPanel createPanel;
 
     private boolean supervisor;
     private int user;
@@ -65,9 +65,20 @@ public class AppWindow {
         // Checkout panel
         checkoutPanel = new CheckoutPanel(user);
 
+        // Return Panel
+        returnPanel = new ReturnPanel(user);
+
+        // Report Panel
+        //reportPanel = new ReportPanel()
+
+        // Add Equipment Panel
+        createPanel = new EquipPanel();
+
         // Add cards
         cardPanel.add(searchPanel, "search");
         cardPanel.add(checkoutPanel.initCheckoutPanel(), "checkout");
+        cardPanel.add(returnPanel.initReturnPanel(), "return");
+        cardPanel.add(createPanel.initEquipPanel(), "create");
 
         window.add(cardPanel, BorderLayout.CENTER);
     }
