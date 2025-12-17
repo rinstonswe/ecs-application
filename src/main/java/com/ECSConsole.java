@@ -1,11 +1,10 @@
 package com;
 
 import java.sql.SQLException;
-import java.util.Scanner;
 
 import javax.swing.SwingUtilities;
 
-import com.security.PasswordHasher;
+import com.data.DatabaseManager;
 import com.ui.Authentication;
 
 /**

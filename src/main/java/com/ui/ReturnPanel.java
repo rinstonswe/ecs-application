@@ -1,6 +1,6 @@
 package com.ui;
 
-import com.Equipment;
+import com.data.Equipment;
 
 import javax.swing.*;
 import java.awt.*;
@@ -99,11 +99,15 @@ public class ReturnPanel {
                     "Return Complete",
                     JOptionPane.INFORMATION_MESSAGE);
 
-            // 🔄 Refresh the center panel
-            panel.remove(0); // remove old center panel
-            panel.add(buildCenterPanel(), BorderLayout.CENTER);
-            panel.revalidate();
-            panel.repaint();
+            refreshPanel();
         }
+    }
+
+    // Refresh the center panel
+    public void refreshPanel(){
+        panel.remove(0); // remove old center panel
+        panel.add(buildCenterPanel(), BorderLayout.CENTER);
+        panel.revalidate();
+        panel.repaint();
     }
 }

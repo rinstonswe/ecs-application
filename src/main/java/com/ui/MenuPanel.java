@@ -7,7 +7,10 @@ import java.awt.event.*;
 import java.awt.event.ActionListener;
 
 public class MenuPanel {
-    private static JPanel panel;
+    private static JPanel panel, returnCard;
+    private static JButton createButton, reportButton;
+
+    public MenuPanel() {}
 
     private static JButton makeButton(String text, Dimension buttonSize){
         JButton button = new JButton(text);
@@ -19,7 +22,7 @@ public class MenuPanel {
         return button;
     };
 
-    public static JPanel initMenuPanel(CardLayout layout, JPanel cardPanel) {
+    public JPanel initMenuPanel(CardLayout layout, JPanel cardPanel, boolean supervisor) {
         panel = new JPanel();
         panel.setLayout(new GridBagLayout());
         panel.setBackground(Color.BLUE);
@@ -40,6 +43,7 @@ public class MenuPanel {
         // button to switch to searchPanel in cardLayout
         JButton searchMenuButton = makeButton("Search", buttonSize);
         searchMenuButton.addActionListener(e -> layout.show(cardPanel,"search"));
+        searchMenuButton.setToolTipText("Search Resources");
         menuGbc.gridx = 0;
         menuGbc.gridy = 1;
         panel.add(searchMenuButton, menuGbc);
@@ -47,27 +51,35 @@ public class MenuPanel {
         // Switch to Check out card
         JButton checkoutButton = makeButton("Checkout", buttonSize);
         checkoutButton.addActionListener(e -> layout.show(cardPanel,"checkout"));
+        checkoutButton.setToolTipText("Checkout Equipment");
         menuGbc.gridx = 0;
         menuGbc.gridy = 2;
         panel.add(checkoutButton,menuGbc);
 
         // Switch to Return Card
         JButton returnButton = makeButton("Return", buttonSize);
-        returnButton.addActionListener(e -> layout.show(cardPanel,"return"));
+        returnButton.addActionListener(e -> {
+            layout.show(cardPanel,"return");
+        });
+        returnButton.setToolTipText("Return Equipment");
         menuGbc.gridx = 0;
         menuGbc.gridy = 3;
         panel.add(returnButton,menuGbc);
 
         // Switch to Report Card
-        JButton reportButton = makeButton("Reports", buttonSize);
+        reportButton = makeButton("Reports", buttonSize);
         searchMenuButton.addActionListener(e -> layout.show(cardPanel,"reports"));
+        reportButton.setToolTipText("Requires Elevation");
+        reportButton.setEnabled(false);
         menuGbc.gridx = 0;
         menuGbc.gridy = 4;
         panel.add(reportButton,menuGbc);
 
-        // Switch to Report Card
-        JButton createButton = makeButton("Add Equip", buttonSize);
+        // Switch to Equipment Add Card
+        createButton = makeButton("Add Equip", buttonSize);
         createButton.addActionListener(e -> layout.show(cardPanel,"create"));
+        createButton.setToolTipText("Requires Elevation");
+        createButton.setEnabled(false);
         menuGbc.gridx = 0;
         menuGbc.gridy = 5;
         panel.add(createButton,menuGbc);
@@ -82,6 +94,7 @@ public class MenuPanel {
         // Application exit button
         JButton exitButton = makeButton("Exit",  buttonSize);
         exitButton.addActionListener(e -> System.exit(0));
+        exitButton.setToolTipText("Exit Application");
         menuGbc.gridx = 0;
         menuGbc.gridy = 7;
         menuGbc.weighty = 0;
@@ -91,12 +104,20 @@ public class MenuPanel {
         // set panel size
         panel.setPreferredSize(new Dimension(85,600));
 
+        if (supervisor) {
+            enableSupButtons();
+        }
+
         return panel;
     }
 
 
+    public void enableSupButtons() {
+        createButton.setEnabled(true);
+        createButton.setToolTipText("Create Equipment");
+        reportButton.setEnabled(true);
+        reportButton.setToolTipText("Generate Reports");
 
 
-
-
+    }
 }

@@ -2,17 +2,20 @@ package com.ui;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 public class AppWindow {
 
     private JFrame window;
-    private JPanel menuPanel;
+    private MenuPanel menuPanel;
     private JPanel cardPanel;
     private JPanel searchPanel, equipPanel, empPanel;
     private CardLayout cardLayout = new CardLayout();
     private CheckoutPanel checkoutPanel;
     private ReturnPanel returnPanel;
     private EquipPanel createPanel;
+    private ReportPanel reportPanel;
 
     private boolean supervisor;
     private int user;
@@ -39,8 +42,9 @@ public class AppWindow {
 
     //------------------------------- Build the left-side menu panel -------------------------------
     private void buildMenu() {
-        menuPanel = MenuPanel.initMenuPanel(cardLayout, cardPanel);
-        window.add(menuPanel, BorderLayout.WEST);
+        menuPanel = new MenuPanel();
+        window.add(menuPanel.initMenuPanel(cardLayout, cardPanel, supervisor), BorderLayout.WEST);
+
     }
 
     //------------------------------- Build the card panel (center) -------------------------------
@@ -67,9 +71,17 @@ public class AppWindow {
 
         // Return Panel
         returnPanel = new ReturnPanel(user);
+        JPanel returnCard = returnPanel.initReturnPanel();
+        returnCard.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                returnCard.revalidate();
+                returnCard.repaint();
+            }
+        });
 
         // Report Panel
-        //reportPanel = new ReportPanel()
+        reportPanel = new ReportPanel();
 
         // Add Equipment Panel
         createPanel = new EquipPanel();
@@ -77,7 +89,13 @@ public class AppWindow {
         // Add cards
         cardPanel.add(searchPanel, "search");
         cardPanel.add(checkoutPanel.initCheckoutPanel(), "checkout");
-        cardPanel.add(returnPanel.initReturnPanel(), "return");
+        cardPanel.add(returnCard, "return");
+        returnCard.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                returnPanel.refreshPanel();
+            }
+        });
         cardPanel.add(createPanel.initEquipPanel(), "create");
 
         window.add(cardPanel, BorderLayout.CENTER);

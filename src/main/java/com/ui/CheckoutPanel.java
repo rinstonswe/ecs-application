@@ -1,7 +1,7 @@
 package com.ui;
 
-import com.Employee;
-import com.Equipment;
+import com.data.Employee;
+import com.data.Equipment;
 
 import javax.swing.*;
 import javax.swing.border.Border;

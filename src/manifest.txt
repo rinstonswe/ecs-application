@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Main-Class: ECSConsole
+Specification-Title: GB Manufacturing Equipment Checkout System
+Specification-Version: 1.0
+Implementation-Version: 1.0
+Created-By: Michael Wright
+Built-By: IntelliJ IDEA 2025.2
+Built-Date: 2025-10-29
+

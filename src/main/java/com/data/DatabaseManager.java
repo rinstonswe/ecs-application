@@ -1,4 +1,4 @@
-package com;
+package com.data;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -44,9 +44,9 @@ public class DatabaseManager {
         }
     }
 
-    // ---------------------------------------------------------
+    //
     // EMPLOYEE INSERT
-    // ---------------------------------------------------------
+    //
     public void addEmployee(String name, String skills) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement(
                 "INSERT INTO Employees (name, skills) VALUES (?, ?)")) {
@@ -56,9 +56,9 @@ public class DatabaseManager {
         }
     }
 
-    // ---------------------------------------------------------
+    //
     // EMPLOYEE GETTERS
-    // ---------------------------------------------------------
+    //
     public Employee getEmployeeById(int id) throws SQLException {
         String sql = """
             SELECT id, name, skills, supervisor, pass_hash

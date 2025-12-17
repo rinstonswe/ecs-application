@@ -1,6 +1,6 @@
 package com.ui;
 
-import com.Equipment;
+import com.data.Equipment;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,6 +1,6 @@
 package com.ui;
 
-import com.Employee;
+import com.data.Employee;
 
 import javax.swing.*;
 import java.awt.*;
