@@ -15,12 +15,14 @@ public class CheckoutPanel {
 
     private final int employeeId;
     private int equipmentId;
+    private boolean match, checkedOut;
     private JTextField equipmentIdField;
     private JTextArea noteField;
     private JTextPane infoTextPane;
     private JButton checkoutButton;
     private JPanel panel, northPanel, centerPanel, southPanel;
     GridBagConstraints c = new GridBagConstraints();
+
 
     public CheckoutPanel(int employeeId) {
         this.employeeId = employeeId;
@@ -115,10 +117,17 @@ public class CheckoutPanel {
                 return;
             }
 
-            boolean match = (equipment.getRequiredSkill() == null || employee.getSkills().contains(equipment.getRequiredSkill()));
-            checkoutButton.setEnabled(match);
+            match = (equipment.getRequiredSkill() == null || employee.getSkills().contains(equipment.getRequiredSkill()));
 
+            checkedOut = equipment.isCheckedOut();
+            if (checkedOut == true) {
+                checkoutButton.setEnabled(false);
+            } else{
+                checkoutButton.setEnabled(match);
+            }
             infoTextPane.setText(buildHtml(equipment, match));
+
+
 
             noteField.setVisible(true);
 
@@ -133,6 +142,10 @@ public class CheckoutPanel {
                 ? "<span style='color: green;'>True</span>"
                 : "<span style='color: red;'>False</span>";
 
+        String isAvailableHtml = checkedOut
+                ? "<span style='color: red;'>Not Available</span>"
+                : "<span style='color: green;'>Available</span>";
+
         return """
                 <html>
                     <body style='font-family: sans-serif;'>
@@ -140,6 +153,7 @@ public class CheckoutPanel {
                         <b>NAME: </b> %s<br>
                         <b>REQUIRED SKILL: </b> %s<br>
                         <b>SKILL MATCH: </b> %s<br>
+                        <b>IS AVAILVABLE: </b> %s<br>
                         <b>CHECKOUT DATE: </b> %s<br>
                         <b>RETURN DATE: </b> %s
                     </body>
@@ -149,6 +163,7 @@ public class CheckoutPanel {
                 eq.getName(),
                 eq.getRequiredSkill(),
                 skillMatchHtml,
+                isAvailableHtml,
                 LocalDate.now(),
                 LocalDate.now().plusDays(5)
         );

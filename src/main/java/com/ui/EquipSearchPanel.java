@@ -13,7 +13,7 @@ import static com.ECSConsole.db;
 
 public class EquipSearchPanel {
     private static JPanel searchPanel;
-    private static JTextPane searchTextArea;
+    private static JTextArea searchTextArea;
     private static JScrollPane searchScroll;
     private static JTextField equipmentIdField, requiredSkillField, nameField;
 
@@ -29,8 +29,14 @@ public class EquipSearchPanel {
         JLabel nameSearchLabel = new JLabel("Name: ");
         nameSearchLabel.setForeground(Color.DARK_GRAY);
 
-        searchTextArea = new JTextPane();
+        searchTextArea = new JTextArea();
         searchTextArea.setEditable(false);
+        searchTextArea.setLineWrap(false);
+        searchTextArea.setWrapStyleWord(false);
+
+        // Add padding to text area
+        searchTextArea.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
         searchScroll = new JScrollPane(searchTextArea);
         Dimension fixed = new Dimension(400, 260);
         searchScroll.setPreferredSize(fixed);

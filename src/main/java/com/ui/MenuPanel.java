@@ -68,7 +68,8 @@ public class MenuPanel {
 
         // Switch to Report Card
         reportButton = makeButton("Reports", buttonSize);
-        searchMenuButton.addActionListener(e -> layout.show(cardPanel,"reports"));
+        reportButton.addActionListener(e ->
+                layout.show(cardPanel,"report"));
         reportButton.setToolTipText("Requires Elevation");
         reportButton.setEnabled(false);
         menuGbc.gridx = 0;

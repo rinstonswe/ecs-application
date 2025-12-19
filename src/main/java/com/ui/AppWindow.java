@@ -86,6 +86,8 @@ public class AppWindow {
         // Add Equipment Panel
         createPanel = new EquipPanel();
 
+        JPanel reportTest = reportPanel.initReportPanel();
+
         // Add cards
         cardPanel.add(searchPanel, "search");
         cardPanel.add(checkoutPanel.initCheckoutPanel(), "checkout");
@@ -97,6 +99,7 @@ public class AppWindow {
             }
         });
         cardPanel.add(createPanel.initEquipPanel(), "create");
+        cardPanel.add(reportTest,"report");
 
         window.add(cardPanel, BorderLayout.CENTER);
     }

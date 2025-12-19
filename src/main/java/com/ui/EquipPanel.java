@@ -21,16 +21,11 @@ public class EquipPanel {
         panel = new JPanel();
         panel.setLayout(new GridBagLayout());
 
-        idLabel = new JLabel("Equipment ID:");
-        idLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 24));
         nameLabel = new JLabel("Equipment Name:");
         nameLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 24));
         skillLabel = new JLabel("Skill Required (Leave blank if no skill):");
         skillLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 24));
 
-        idField = new JTextField();
-        idField.setPreferredSize(new Dimension(200, 40));
-        idField.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 24));
         nameField = new JTextField();
         nameField.setPreferredSize(new Dimension(200, 40));
         nameField.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 24));
@@ -46,7 +41,7 @@ public class EquipPanel {
                 if (skill.isEmpty()) {
                     skill = null;
                 }
-                db.addEquipment(parseInt(idField.getText()), nameField.getText(), skill);
+                db.addEquipment(nameField.getText(), skill);
 
                 JOptionPane.showMessageDialog(panel,
                         "Equipment Created!",
@@ -73,18 +68,14 @@ public class EquipPanel {
 
         });
         GridBagConstraints gbc = c(0,0);
-        panel.add(idLabel, gbc);
-        gbc = c(0,1);
-        panel.add(idField, gbc);
-        gbc = c(0,2);
         panel.add(nameLabel, gbc);
-        gbc = c(0,3);
+        gbc = c(0,1);
         panel.add(nameField, gbc);
-        gbc = c(0,4);
+        gbc = c(0,2);
         panel.add(skillLabel, gbc);
-        gbc = c(0,5);
+        gbc = c(0,3);
         panel.add(skillField, gbc);
-        gbc = c(0,6);
+        gbc = c(0,4);
         panel.add(equipButton, gbc);
 
         return panel;

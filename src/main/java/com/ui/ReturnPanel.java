@@ -107,6 +107,7 @@ public class ReturnPanel {
     public void refreshPanel(){
         panel.remove(0); // remove old center panel
         panel.add(buildCenterPanel(), BorderLayout.CENTER);
+        panel.add(returnButton, BorderLayout.SOUTH);
         panel.revalidate();
         panel.repaint();
     }
