@@ -11,11 +11,18 @@ Our code is intended to be simple, modular, and sustainable. We achieved this by
 
 ## Project Planning
 
+The project was planned over 4 weeks
 
 
 ## Code Creation
 
+The code was primarily written over a three-week period from December 1st, 2025 until December 21st, 2025.
 
+The code started highly unorganized with no package management, the final code base was slightly more organized containing three main package UI, Security, and Data.
+
+### UI Package (Interface Layer)
+
+The UI package is the meat of the program, it is also the top layer of our system architecture. This is what our user will interact with, this will never directly interact with the database
 
 ## Testing methods
 

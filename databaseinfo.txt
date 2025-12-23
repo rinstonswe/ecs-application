@@ -1,0 +1,29 @@
+testing user id and password combos:
+ id     -  password
+10001   -   user1
+10002   -   user2
+10003   -   user3
+10004   -   user4
+
+database schema:
+CREATE TABLE employees (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    skills TEXT,
+    supervisor BOOLEAN,
+    pass_hash TEXT NOT NULL DEFAULT please_change_me);
+CREATE TABLE equipment (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    req_skill TEXT,
+    is_checked_out INTEGER DEFAULT 0,
+    current_holder_id INTEGER);
+CREATE TABLE checkouts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    equipment_id INTEGER REFERENCES equipment(id),
+    employee_id INTEGER REFERENCES employees(id),
+    checkout_time DATETIME,
+    due_time DATETIME,
+    return_time DATETIME NULL,
+    notes TEXT
+    );
