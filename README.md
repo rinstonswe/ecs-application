@@ -1,8 +1,5 @@
 # ECS Application 
 
-> [!WARNING]
-> This application is actively in development and is not in a stable state currently
-
 ## Overview
 
 The Equipment Checkout application is a hypothetical system to address modernization at a company from an outdated and error-prone manual pen-and-paper system to an enterprise grade application.
